@@ -379,12 +379,12 @@
   <!-- TELA 3: RESPOSTA "NÃO" PARA TUDO BEM -->
   <section class="tela" id="tela-nao-tudobem">
     <h1>O que posso fazer para minha princesa se sentir melhor?</h1>
-    <div class="botoes" style="flex-direction:column;">
-      <button class="btn-alt" onclick="respostaPresente('Pix')">A) Mandar um Pix</button>
-      <button class="btn-alt" onclick="respostaPresente('Sushi')">B) Pagar um Sushi</button>
-      <button class="btn-alt" onclick="respostaPresente('Bruno Mars')">C) Show do Bruno Mars</button>
-      <button class="btn-alt" onclick="respostaPresente('Armandinho')">D) Show do Armandinho</button>
-      <button class="btn-alt" onclick="respostaPresente('Todas')">E) Todas as opções</button>
+    <div class="botoes" style="flex-direction:column;" id="lista-presentes">
+      <button class="btn-alt" data-op="pix" onclick="clicarPresente(this)">A) Mandar um Pix</button>
+      <button class="btn-alt" data-op="sushi" onclick="clicarPresente(this)">B) Pagar um Sushi</button>
+      <button class="btn-alt" data-op="brunomars" onclick="clicarPresente(this)">C) Show do Bruno Mars</button>
+      <button class="btn-alt" data-op="armandinho" onclick="clicarPresente(this)">D) Show do Armandinho</button>
+      <button class="btn-alt" data-op="todas" onclick="clicarPresente(this)">E) Todas as opções</button>
     </div>
     <p class="texto" id="msg-presente" style="display:none; font-weight:bold; color:var(--vermelho); font-size: clamp(1.3rem, 4.2vw, 1.7rem);">Eu faria isso com prazer por você! ❤️</p>
   </section>
@@ -512,11 +512,49 @@ function respostaTudoBem(simClicado){
   }
 }
 
-function respostaPresente(opcao){
-  document.getElementById('msg-presente').style.display = 'block';
-  setTimeout(() => {
-    irPara('tela-gosto-voce');
-  }, 4500);
+/* =====================================================================
+   FLUXO: "O QUE POSSO FAZER PARA VOCÊ SE SENTIR MELHOR"
+===================================================================== */
+const mensagensPresentes = {
+  pix: 'Eu mandaria um Pix tão grande que o Banco Central ia me ligar perguntando se está tudo bem comigo! 💸😂',
+  sushi: 'Eu pagaria todo o oceano Atlântico de peixes só pra você comer sushi à vontade! 🍣🌊',
+  brunomars: 'Eu até canto e danço pra você as músicas dele (bem desafinado, mas com muito amor)! 🎤💃',
+  armandinho: 'Eu aprenderia a tocar ukulelê só pra te acompanhar cantando no show do Armandinho! 🎸😍',
+  todas: 'Eu faria tudo isso junto, nem que precisasse arrumar mais dois empregos! 😂❤️'
+};
+const fraseTenteOutra = [
+  'Tente outra opção! 😄',
+  'Vai, escolhe mais uma!',
+  'Ainda tem mais por aqui...',
+  'Clica em outra também!'
+];
+const presentesClicados = new Set();
+const totalPresentes = 5;
+
+function clicarPresente(botao){
+  const op = botao.getAttribute('data-op');
+
+  if(!presentesClicados.has(op)){
+    presentesClicados.add(op);
+    botao.style.transform = 'scale(0.9) rotate(-5deg)';
+    setTimeout(() => { botao.style.transform = ''; }, 300);
+    exibirAvisoFlutuante(mensagensPresentes[op], botao);
+  }
+
+  if(presentesClicados.size >= totalPresentes){
+    document.getElementById('lista-presentes').style.display = 'none';
+    setTimeout(() => {
+      document.getElementById('msg-presente').style.display = 'block';
+    }, 900);
+    setTimeout(() => {
+      irPara('tela-gosto-voce');
+    }, 4500);
+  } else {
+    setTimeout(() => {
+      const frase = fraseTenteOutra[Math.floor(Math.random()*fraseTenteOutra.length)];
+      exibirAvisoFlutuante(frase, botao);
+    }, 2500);
+  }
 }
 
 /* =====================================================================
