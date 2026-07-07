@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>💕 Para Agnes 💕</title>
+<style>
+  /* ===================================================
+     RESET E BASE
+  =================================================== */
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root{
+    --rosa-choque: #ff4fa3;
+    --rosa-claro: #ffc2e2;
+    --vermelho: #e0143c;
+    --dourado: #ffd700;
+    --dourado-escuro: #b8860b;
+    --branco-brilho: #fff9fc;
+  }
+
+  html, body{
+    width:100%;
+    height:100%;
+    min-height:100vh;
+    min-height:100dvh; /* evita "zoom" causado pela barra do navegador no iOS */
+    overflow-x:hidden;
+    touch-action: manipulation; /* evita zoom por duplo toque */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    font-family: 'Brush Script MT', 'Segoe Script', 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(-45deg, #ff9a9e, #fecfef, #ff6a95, #ffb6c1, #e0143c, #ff4fa3);
+    background-size: 400% 400%;
+    animation: gradienteFundo 12s ease infinite;
+    color:#7a003c;
+    position:relative;
+  }
+
+  @keyframes gradienteFundo{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+
+  /* Colagem de "fotos" de fundo simuladas com molduras douradas giratórias */
+  .colagem-fundo{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .foto-decorativa{
+    position:absolute;
+    width:140px;
+    height:100px;
+    border:6px solid var(--dourado);
+    border-radius:8px;
+    background: repeating-linear-gradient(45deg, #ffb6c1, #ffb6c1 10px, #ff8fb3 10px, #ff8fb3 20px);
+    box-shadow: 0 0 15px rgba(255,215,0,0.7), inset 0 0 10px rgba(255,255,255,0.5);
+    opacity:0.35;
+    animation: flutuarFoto 8s ease-in-out infinite;
+  }
+  @keyframes flutuarFoto{
+    0%,100%{ transform: translateY(0) rotate(var(--rot,0deg)); }
+    50%{ transform: translateY(-20px) rotate(calc(var(--rot,0deg) + 4deg)); }
+  }
+
+  /* Estrelas cintilantes */
+  .estrela{
+    position:fixed;
+    color: var(--dourado);
+    font-size:1.2rem;
+    z-index:1;
+    pointer-events:none;
+    animation: piscar 1.6s ease-in-out infinite;
+  }
+  @keyframes piscar{
+    0%,100%{ opacity:0.2; transform:scale(0.8); }
+    50%{ opacity:1; transform:scale(1.3); }
+  }
+
+  /* Corações subindo continuamente */
+  .coracao-subindo{
+    position:fixed;
+    bottom:-40px;
+    font-size: 1.8rem;
+    z-index:2;
+    pointer-events:none;
+    animation: subir linear forwards;
+    filter: drop-shadow(0 0 6px #ff4fa3);
+  }
+  @keyframes subir{
+    0%{ transform: translateY(0) translateX(0) rotate(0deg); opacity:1; }
+    100%{ transform: translateY(-110vh) translateX(var(--drift,0px)) rotate(360deg); opacity:0; }
+  }
+
+  /* ===================================================
+     CONTAINER PRINCIPAL
+  =================================================== */
+  #app{
+    position:relative;
+    z-index:10;
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  }
+
+  .tela{
+    display:none;
+    width:100%;
+    max-width:600px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,214,235,0.92));
+    border:8px double var(--dourado);
+    border-radius:24px;
+    box-shadow: 0 0 40px rgba(255,79,163,0.8), 0 0 80px rgba(255,215,0,0.4) inset;
+    padding:35px 25px;
+    text-align:center;
+    position:relative;
+    animation: entrarTela 0.7s ease;
+    box-sizing:border-box;
+  }
+  .tela.ativa{ display:block; }
+
+  @keyframes entrarTela{
+    0%{ opacity:0; transform: scale(0.85) translateY(30px); }
+    100%{ opacity:1; transform: scale(1) translateY(0); }
+  }
+
+  .tela::before, .tela::after{
+    content:"✨💖✨";
+    position:absolute;
+    font-size:1.4rem;
+    left:50%;
+    transform:translateX(-50%);
+    animation: brilhoTopo 2s ease-in-out infinite;
+  }
+  .tela::before{ top:-18px; }
+  .tela::after{ bottom:-18px; }
+  @keyframes brilhoTopo{
+    0%,100%{ opacity:0.5; }
+    50%{ opacity:1; }
+  }
+
+  h1{
+    font-family: 'Brush Script MT', 'Segoe Script', cursive;
+    font-size: clamp(2.1rem, 7vw, 3.4rem);
+    color: var(--vermelho);
+    text-shadow: 2px 2px 0 var(--dourado), 0 0 20px #fff;
+    margin-bottom: 18px;
+    animation: pulsarTitulo 2s ease-in-out infinite;
+  }
+  @keyframes pulsarTitulo{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.04); }
+  }
+
+  p.texto{
+    font-family: 'Georgia', serif;
+    font-size: clamp(1.2rem, 4vw, 1.6rem);
+    color:#7a003c;
+    line-height:1.7;
+    margin: 16px 0;
+  }
+
+  /* Botões */
+  .botoes{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    justify-content:center;
+    margin-top:25px;
+  }
+  button{
+    font-family: 'Georgia', serif;
+    font-size: clamp(1.15rem, 3.2vw, 1.4rem);
+    font-weight:bold;
+    padding:16px 30px;
+    border:3px solid var(--dourado);
+    border-radius:50px;
+    cursor:pointer;
+    background: linear-gradient(135deg, var(--rosa-choque), var(--vermelho));
+    color:#fff;
+    box-shadow: 0 4px 15px rgba(224,20,60,0.5);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: pulsarBotao 1.8s ease-in-out infinite;
+  }
+  @keyframes pulsarBotao{
+    0%,100%{ box-shadow: 0 4px 15px rgba(224,20,60,0.5); }
+    50%{ box-shadow: 0 4px 25px rgba(255,215,0,0.8); }
+  }
+  button:hover{
+    transform: scale(1.1) rotate(-2deg);
+    background: linear-gradient(135deg, var(--vermelho), var(--rosa-choque));
+  }
+  button:active{ transform: scale(0.95); }
+
+  .btn-alt{
+    display:block;
+    width:100%;
+    text-align:left;
+    margin:6px 0;
+    border-radius:12px;
+    background: linear-gradient(135deg, #fff, var(--rosa-claro));
+    color: var(--vermelho);
+  }
+  .btn-alt:hover{ background: linear-gradient(135deg, var(--rosa-claro), #fff); }
+
+  /* Mensagem de resposta errada */
+  .flash-msg{
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    color: var(--vermelho);
+    font-weight:bold;
+    margin-top:14px;
+    animation: tremer 0.4s ease;
+  }
+  @keyframes tremer{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-8px); }
+    75%{ transform: translateX(8px); }
+  }
+
+  /* Contador nível de paixão */
+  #nivel-paixao{
+    position:fixed;
+    top:10px;
+    right:10px;
+    z-index:50;
+    background: rgba(255,255,255,0.85);
+    border:3px solid var(--dourado);
+    border-radius:20px;
+    padding:8px 14px;
+    font-family: 'Georgia', serif;
+    font-size:0.85rem;
+    font-weight:bold;
+    color: var(--vermelho);
+    box-shadow: 0 0 15px rgba(255,79,163,0.5);
+  }
+
+  /* Mensagens românticas no canto inferior */
+  #msg-canto{
+    position:fixed;
+    bottom:15px;
+    left:15px;
+    z-index:50;
+    background: rgba(255,255,255,0.9);
+    border:2px solid var(--rosa-choque);
+    border-radius:14px;
+    padding:8px 14px;
+    font-size:0.85rem;
+    color:#7a003c;
+    max-width:250px;
+    opacity:0;
+    transition: opacity 0.6s ease;
+    pointer-events:none;
+  }
+  #msg-canto.visivel{ opacity:1; }
+
+  /* Coração gigante easter egg */
+  #coracao-gigante{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:min(50vw, 400px);
+    z-index:200;
+    pointer-events:none;
+    animation: pulsarGigante 0.8s ease;
+    filter: drop-shadow(0 0 40px #ff4fa3);
+  }
+  @keyframes pulsarGigante{
+    0%{ opacity:0; transform:scale(0.3); }
+    50%{ opacity:1; transform:scale(1.1); }
+    100%{ opacity:1; transform:scale(1); }
+  }
+
+  /* Confetes e explosao */
+  .particula{
+    position:fixed;
+    z-index:150;
+    pointer-events:none;
+    font-size:1.5rem;
+  }
+
+  /* Mensagens de "advertência" flutuantes, aparecem perto do botão clicado */
+  .aviso-flutuante{
+    position:fixed;
+    z-index:300;
+    max-width: min(260px, 80vw);
+    background: linear-gradient(135deg, #fff, var(--rosa-claro));
+    border:3px solid var(--vermelho);
+    border-radius:16px;
+    padding:12px 16px;
+    font-family:'Georgia', serif;
+    font-weight:bold;
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    color: var(--vermelho);
+    text-align:center;
+    box-shadow: 0 0 20px rgba(224,20,60,0.6), 0 0 10px rgba(255,215,0,0.5);
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity:0;
+    pointer-events:none;
+    animation: avisoAparecer 0.35s ease forwards, avisoSumir 0.4s ease 1.9s forwards;
+  }
+  @keyframes avisoAparecer{
+    0%{ opacity:0; transform: translate(-50%, -50%) scale(0.5) rotate(-6deg); }
+    60%{ opacity:1; transform: translate(-50%, -50%) scale(1.08) rotate(2deg); }
+    100%{ opacity:1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  }
+  @keyframes avisoSumir{
+    0%{ opacity:1; }
+    100%{ opacity:0; transform: translate(-50%, -60%) scale(0.85); }
+  }
+
+  footer.dica{
+    margin-top:18px;
+    font-size:0.75rem;
+    color:#a0004d;
+    opacity:0.7;
+  }
+
+  @media (max-width:480px){
+    .tela{ padding:22px 14px; margin: 0 4px; }
+    .botoes{ flex-direction:column; }
+    button{ width:100%; }
+    .tela::before, .tela::after{ font-size:1.1rem; }
+    .tela::before{ top:-14px; }
+    .tela::after{ bottom:-14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Fundo decorativo (colagem + estrelas) gerado via JS -->
+<div class="colagem-fundo" id="colagem-fundo"></div>
+
+<!-- Contador de nível de paixão (easter egg sempre visível) -->
+<div id="nivel-paixao">💘 Nível de paixão: <span id="valor-paixao">0</span>%</div>
+
+<!-- Mensagens no canto inferior -->
+<div id="msg-canto"></div>
+
+<!-- Coração gigante (easter egg de clique no fundo) -->
+<div id="coracao-gigante">❤️</div>
+
+<div id="app">
+
+  <!-- TELA 0: INTRO -->
+  <section class="tela ativa" id="tela-intro">
+    <h1>💖 Carregando o amor... 💖</h1>
+    <p class="texto">Preparando corações, brilhos e uma dose de nostalgia romântica...</p>
+    <div class="botoes">
+      <button onclick="irPara('tela-saudacao')">Entrar 💌</button>
+    </div>
+  </section>
+
+  <!-- TELA 1: SAUDAÇÃO -->
+  <section class="tela" id="tela-saudacao">
+    <h1>Olá, Agnes! Tudo bem?</h1>
+    <p class="texto">Escolha uma opção para continuarmos.</p>
+    <div class="botoes">
+      <button onclick="respostaTudoBem(true)">❤️ Sim</button>
+      <button onclick="respostaTudoBem(false)">💔 Não</button>
+    </div>
+  </section>
+
+  <!-- TELA 2: RESPOSTA "SIM" PARA TUDO BEM -->
+  <section class="tela" id="tela-sim-tudobem">
+    <h1>Que bom! 🥰</h1>
+    <p class="texto">Fico genuinamente feliz por estar bem! Sempre ando pensando em você e como seria prazeroso e renovador ouvir sua voz pessoalmente enquanto vejo o brilho dos seus olhos.</p>
+    <p class="texto" id="falando-nisso-1" style="display:none;">Falando nisso...</p>
+  </section>
+
+  <!-- TELA 3: RESPOSTA "NÃO" PARA TUDO BEM -->
+  <section class="tela" id="tela-nao-tudobem">
+    <h1>O que posso fazer para minha princesa se sentir melhor?</h1>
+    <div class="botoes" style="flex-direction:column;">
+      <button class="btn-alt" onclick="respostaPresente('Pix')">A) Mandar um Pix</button>
+      <button class="btn-alt" onclick="respostaPresente('Sushi')">B) Pagar um Sushi</button>
+      <button class="btn-alt" onclick="respostaPresente('Bruno Mars')">C) Show do Bruno Mars</button>
+      <button class="btn-alt" onclick="respostaPresente('Armandinho')">D) Show do Armandinho</button>
+      <button class="btn-alt" onclick="respostaPresente('Todas')">E) Todas as opções</button>
+    </div>
+    <p class="texto" id="msg-presente" style="display:none; font-weight:bold; color:var(--vermelho); font-size: clamp(1.3rem, 4.2vw, 1.7rem);">Eu faria isso com prazer por você! ❤️</p>
+  </section>
+
+  <!-- TELA 4: SABE DO QUE MAIS GOSTO EM VOCÊ -->
+  <section class="tela" id="tela-gosto-voce">
+    <h1>Sabe do que mais gosto em você?</h1>
+    <div class="botoes" style="flex-direction:column;" id="lista-alternativas">
+      <button class="btn-alt" data-op="voz" onclick="clicarAlternativa(this)">A) Sua voz</button>
+      <button class="btn-alt" data-op="cabelo" onclick="clicarAlternativa(this)">B) Seu cabelo</button>
+      <button class="btn-alt" data-op="pele" onclick="clicarAlternativa(this)">C) Sua pele</button>
+      <button class="btn-alt" data-op="olhos" onclick="clicarAlternativa(this)">D) Seus olhos</button>
+      <button class="btn-alt" data-op="sorriso" onclick="clicarAlternativa(this)">E) Seu sorriso</button>
+      <button class="btn-alt" data-op="cintura" onclick="clicarAlternativa(this)">F) Sua cintura</button>
+    </div>
+  </section>
+
+  <!-- TELA 5: REVELAÇÃO FINAL -->
+  <section class="tela" id="tela-revelacao">
+    <h1>✨ A verdade ✨</h1>
+    <p class="texto">Você errou as respostas, pois eu gosto de absolutamente tudo em você! Aos meus olhos você foi agraciada pelo divino com uma beleza angelical!</p>
+    <p class="texto">O que me remete a boas memórias é a expectativa de vivenciar novas; sendo assim, desfrutar da melhor companhia que já tive em anos.</p>
+    <p class="texto">Gostaria de convidá-la para uma tarde de aventuras e grandes emoções.</p>
+    <p class="texto"><strong>O que me diz? Aceita?</strong></p>
+    <div class="botoes">
+      <button onclick="respostaConvite(true)">❤️ Sim</button>
+      <button onclick="respostaConvite(false)">💔 Não</button>
+    </div>
+  </section>
+
+  <!-- TELA 6: SEQUÊNCIA DE PIADAS (NÃO) -->
+  <section class="tela" id="tela-piadas">
+    <h1>Hmm... 🤔</h1>
+    <p class="texto">Clique no botão abaixo para ver a resposta do sistema:</p>
+    <div class="botoes">
+      <button id="btn-tentar-novamente" onclick="proximaPiada()">Tentar novamente 🔁</button>
+    </div>
+  </section>
+
+  <!-- TELA 7: REPETIÇÃO DA PERGUNTA -->
+  <section class="tela" id="tela-repetir-pergunta">
+    <h1>Então... 💭</h1>
+    <p class="texto"><strong>Aceita sair comigo?</strong></p>
+    <div class="botoes">
+      <button onclick="respostaConvite(true)">❤️ Sim</button>
+      <button onclick="respostaConvite(false)">💔 Não</button>
+    </div>
+  </section>
+
+  <!-- TELA 8: SUCESSO / REDIRECIONAMENTO -->
+  <section class="tela" id="tela-sucesso">
+    <h1>🎉 Ela disse sim! 🎉</h1>
+    <p class="texto">Preparando tudo para o nosso encontro...</p>
+    <footer class="dica">Você será redirecionada automaticamente.</footer>
+  </section>
+
+</div>
+
+<!-- ===================================================
+     TRILHA SONORA (opcional) — descomente e ajuste o caminho
+     <audio id="trilha-sonora" src="sua-musica.mp3" loop autoplay></audio>
+=================================================== -->
+
+<!-- ===================================================
+     SOM DE CLIQUE (opcional) — descomente e ajuste o caminho
+     <audio id="som-clique" src="clique.mp3"></audio>
+=================================================== -->
+
+<script>
+/* =====================================================================
+   AVISOS FLUTUANTES (aparecem perto do botão clicado, em posição aleatória)
+===================================================================== */
+function exibirAvisoFlutuante(mensagem, elementoReferencia){
+  const aviso = document.createElement('div');
+  aviso.className = 'aviso-flutuante';
+  aviso.textContent = mensagem;
+  document.body.appendChild(aviso);
+
+  const rect = elementoReferencia.getBoundingClientRect();
+  const pontoX = rect.left + rect.width / 2;
+  const pontoY = rect.top + rect.height / 2;
+
+  // deslocamento aleatório perto do botão (varia de aparição pra aparição)
+  const anguloAleatorio = Math.random() * Math.PI * 2;
+  const distancia = 70 + Math.random() * 50;
+  let x = pontoX + Math.cos(anguloAleatorio) * distancia;
+  let y = pontoY + Math.sin(anguloAleatorio) * distancia - 30; // tende a ficar um pouco acima
+
+  // mantém o aviso dentro da tela (não deixa cortar nas beiradas)
+  const margem = 90;
+  x = Math.max(margem, Math.min(x, window.innerWidth - margem));
+  y = Math.max(70, Math.min(y, window.innerHeight - 70));
+
+  aviso.style.left = x + 'px';
+  aviso.style.top = y + 'px';
+
+  setTimeout(() => aviso.remove(), 2400);
+}
+
+/* =====================================================================
+   NAVEGAÇÃO ENTRE TELAS
+===================================================================== */
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  alvo.classList.add('ativa');
+  window.scrollTo({top:0, behavior:'smooth'});
+  // tocarSom(); // descomente se usar som de clique
+}
+
+/* =====================================================================
+   FLUXO: "TUDO BEM?"
+===================================================================== */
+function respostaTudoBem(simClicado){
+  if(simClicado){
+    irPara('tela-sim-tudobem');
+    setTimeout(() => {
+      document.getElementById('falando-nisso-1').style.display = 'block';
+    }, 6500);
+    setTimeout(() => {
+      irPara('tela-gosto-voce');
+    }, 10000);
+  } else {
+    irPara('tela-nao-tudobem');
+  }
+}
+
+function respostaPresente(opcao){
+  document.getElementById('msg-presente').style.display = 'block';
+  setTimeout(() => {
+    irPara('tela-gosto-voce');
+  }, 4500);
+}
+
+/* =====================================================================
+   FLUXO: "SABE DO QUE MAIS GOSTO EM VOCÊ"
+===================================================================== */
+const alternativasClicadas = new Set();
+const totalAlternativas = 6;
+const frasesErradas = [
+  'Resposta errada. Tente novamente!',
+  'Quase! Mas ainda não é essa...',
+  'Hmm, tente outra vez!',
+  'Não foi dessa vez, mas continue tentando!'
+];
+
+function clicarAlternativa(botao){
+  const op = botao.getAttribute('data-op');
+
+  if(!alternativasClicadas.has(op)){
+    alternativasClicadas.add(op);
+    // pequena animação divertida no botão clicado
+    botao.style.transform = 'scale(0.9) rotate(-5deg)';
+    setTimeout(() => { botao.style.transform = ''; }, 300);
+
+    const mensagem = frasesErradas[Math.floor(Math.random()*frasesErradas.length)];
+    exibirAvisoFlutuante(mensagem, botao);
+  }
+
+  if(alternativasClicadas.size >= totalAlternativas){
+    // todas foram clicadas
+    document.getElementById('lista-alternativas').style.display = 'none';
+    explosaoDeBrilho();
+    setTimeout(() => {
+      irPara('tela-revelacao');
+    }, 2200);
+  }
+}
+
+/* =====================================================================
+   FLUXO: CONVITE PARA A TARDE DE AVENTURAS
+===================================================================== */
+function respostaConvite(simClicado){
+  if(simClicado){
+    irPara('tela-sucesso');
+    explosaoDeComemoracao();
+    setTimeout(() => {
+      // Redireciona diretamente para o WhatsApp +55 11 96842-4806
+      window.location.href = "https://wa.me/5511968424806?text=Eu%20n%C3%A3o%20via%20mais%20a%20hora%20de%20te%20ver";
+    }, 4500);
+  } else {
+    iniciarSequenciaPiadas();
+  }
+}
+
+/* =====================================================================
+   SEQUÊNCIA DE PIADAS (FLUXO "NÃO")
+===================================================================== */
+const mensagensPiadas = [
+  '⚠️ Erro 404: coragem de dizer "não" não encontrada.',
+  '🤔 Acho que esse botão está com defeito...',
+  '🩷 Aguarde... consultando o Conselho Mundial dos Namorados...',
+  '💘 Cupido solicitou uma nova análise.',
+  '✨ Recalculando probabilidades...',
+  '📡 Entrando em contato com o destino...',
+  '❤️ O universo pediu para perguntar só mais uma vez.',
+  '😂 Tem certeza? Essa resposta parece suspeita.',
+  '🤨 Vou fingir que não vi essa resposta.',
+  '😍 Acho que seu dedo escorregou...'
+];
+
+let filaPiadas = [];
+let ultimaPiada = null;
+let contadorPiadasExibidas = 0;
+const META_PIADAS = 8;
+
+function embaralhar(array){
+  const copia = [...array];
+  for(let i = copia.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i+1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+function iniciarSequenciaPiadas(){
+  contadorPiadasExibidas = 0;
+  filaPiadas = embaralhar(mensagensPiadas);
+  irPara('tela-piadas');
+  mostrarPiadaAtual();
+}
+
+function mostrarPiadaAtual(){
+  if(filaPiadas.length === 0){
+    filaPiadas = embaralhar(mensagensPiadas.filter(m => m !== ultimaPiada));
+  }
+  const msg = filaPiadas.shift();
+  ultimaPiada = msg;
+  contadorPiadasExibidas++;
+
+  const botaoRef = document.getElementById('btn-tentar-novamente');
+  exibirAvisoFlutuante(msg, botaoRef);
+
+  // pequena animação divertida a cada piada
+  const tela = document.getElementById('tela-piadas');
+  tela.style.transform = 'scale(0.97)';
+  setTimeout(() => { tela.style.transform = 'scale(1)'; }, 200);
+
+  criarConfeteRapido();
+}
+
+function proximaPiada(){
+  if(contadorPiadasExibidas >= META_PIADAS){
+    irPara('tela-repetir-pergunta');
+    return;
+  }
+  mostrarPiadaAtual();
+}
+
+/* =====================================================================
+   ANIMAÇÕES DE EFEITO (CORAÇÕES, CONFETES, BRILHO)
+===================================================================== */
+function explosaoDeBrilho(){
+  for(let i=0;i<25;i++){
+    const brilho = document.createElement('div');
+    brilho.className = 'particula';
+    brilho.textContent = '✨';
+    brilho.style.left = (45 + Math.random()*10) + 'vw';
+    brilho.style.top = (40 + Math.random()*10) + 'vh';
+    brilho.style.animation = `subir ${1+Math.random()}s ease-out forwards`;
+    brilho.style.setProperty('--drift', (Math.random()*200-100)+'px');
+    document.body.appendChild(brilho);
+    setTimeout(() => brilho.remove(), 2000);
+  }
+}
+
+function explosaoDeComemoracao(){
+  const emojis = ['❤️','🎉','✨','⭐','🎊','💖','🌹'];
+  for(let i=0;i<60;i++){
+    const p = document.createElement('div');
+    p.className = 'particula';
+    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.top = '100vh';
+    p.style.fontSize = (1 + Math.random()*1.5) + 'rem';
+    p.style.animation = `subir ${1.5 + Math.random()*2}s ease-out forwards`;
+    p.style.setProperty('--drift', (Math.random()*300-150)+'px');
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 3600);
+  }
+}
+
+function criarConfeteRapido(){
+  const emojis = ['🎊','✨','😂'];
+  for(let i=0;i<8;i++){
+    const p = document.createElement('div');
+    p.className = 'particula';
+    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.top = '100vh';
+    p.style.animation = `subir ${1+Math.random()}s ease-out forwards`;
+    p.style.setProperty('--drift', (Math.random()*150-75)+'px');
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 2000);
+  }
+}
+
+/* =====================================================================
+   FUNDO: COLAGEM DECORATIVA + ESTRELAS CINTILANTES
+===================================================================== */
+function gerarFundoDecorativo(){
+  const container = document.getElementById('colagem-fundo');
+  const totalFotos = 10;
+  for(let i=0;i<totalFotos;i++){
+    const foto = document.createElement('div');
+    foto.className = 'foto-decorativa';
+    foto.style.left = Math.random()*90 + 'vw';
+    foto.style.top = Math.random()*90 + 'vh';
+    foto.style.setProperty('--rot', (Math.random()*30-15)+'deg');
+    foto.style.animationDelay = (Math.random()*5)+'s';
+    container.appendChild(foto);
+  }
+  const totalEstrelas = 30;
+  for(let i=0;i<totalEstrelas;i++){
+    const estrela = document.createElement('div');
+    estrela.className = 'estrela';
+    estrela.textContent = '⭐';
+    estrela.style.left = Math.random()*100 + 'vw';
+    estrela.style.top = Math.random()*100 + 'vh';
+    estrela.style.animationDelay = (Math.random()*3)+'s';
+    document.body.appendChild(estrela);
+  }
+}
+
+/* =====================================================================
+   CORAÇÕES FLUTUANTES CONTÍNUOS
+===================================================================== */
+function criarCoracaoFlutuante(){
+  const emojisCoracao = ['❤️','💖','💕','💗','💓'];
+  const coracao = document.createElement('div');
+  coracao.className = 'coracao-subindo';
+  coracao.textContent = emojisCoracao[Math.floor(Math.random()*emojisCoracao.length)];
+  coracao.style.left = Math.random()*100 + 'vw';
+  coracao.style.setProperty('--drift', (Math.random()*160-80)+'px');
+  coracao.style.animationDuration = (5 + Math.random()*5) + 's';
+  document.body.appendChild(coracao);
+  setTimeout(() => coracao.remove(), 11000);
+}
+setInterval(criarCoracaoFlutuante, 600);
+
+/* =====================================================================
+   EASTER EGGS
+===================================================================== */
+
+// 1) Clicar várias vezes no fundo -> coração gigante
+let contadorCliquesFundo = 0;
+document.addEventListener('click', (e) => {
+  if(e.target === document.body || e.target.id === 'app'){
+    contadorCliquesFundo++;
+    if(contadorCliquesFundo >= 7){
+      contadorCliquesFundo = 0;
+      mostrarCoracaoGigante();
+    }
+  }
+});
+function mostrarCoracaoGigante(){
+  const el = document.getElementById('coracao-gigante');
+  el.style.display = 'flex';
+  setTimeout(() => { el.style.display = 'none'; }, 1200);
+}
+
+// 2) Tecla espaço -> chuva de corações
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space'){
+    e.preventDefault();
+    for(let i=0;i<20;i++){
+      setTimeout(criarCoracaoFlutuante, i*50);
+    }
+  }
+});
+
+// 3) Nível de paixão sobe lentamente até 100%
+let nivelAtual = 0;
+const spanNivel = document.getElementById('valor-paixao');
+const intervaloNivel = setInterval(() => {
+  if(nivelAtual >= 100){
+    clearInterval(intervaloNivel);
+    return;
+  }
+  nivelAtual++;
+  spanNivel.textContent = nivelAtual;
+}, 900);
+
+// 4) Mensagens românticas aleatórias no canto inferior
+const mensagensCanto = [
+  'Você é a razão do meu sorriso hoje. 💕',
+  'Pensando em você agora mesmo... 💭❤️',
+  'Cada detalhe seu é encantador. ✨',
+  'Contando os minutos para te ver. ⏳💖',
+  'Você ilumina qualquer ambiente. 🌟'
+];
+function exibirMensagemCanto(){
+  const el = document.getElementById('msg-canto');
+  el.textContent = mensagensCanto[Math.floor(Math.random()*mensagensCanto.length)];
+  el.classList.add('visivel');
+  setTimeout(() => {
+    el.classList.remove('visivel');
+  }, 4000);
+}
+setInterval(exibirMensagemCanto, 9000);
+
+/* =====================================================================
+   INICIALIZAÇÃO
+===================================================================== */
+window.addEventListener('DOMContentLoaded', () => {
+  gerarFundoDecorativo();
+  setTimeout(exibirMensagemCanto, 2000);
+});
+
+/* =====================================================================
+   FUNÇÃO OPCIONAL PARA SOM DE CLIQUE (descomente para ativar)
+=====================================================================
+function tocarSom(){
+  const som = document.getElementById('som-clique');
+  if(som){ som.currentTime = 0; som.play(); }
+}
+*/
+</script>
+</body>
+</html>
