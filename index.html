@@ -305,7 +305,7 @@
     transform: translate(-50%, -50%) scale(0.7);
     opacity:0;
     pointer-events:none;
-    animation: avisoAparecer 0.35s ease forwards, avisoSumir 0.4s ease 1.9s forwards;
+    animation: avisoAparecer 0.35s ease forwards, avisoSumir 0.5s ease 4s forwards;
   }
   @keyframes avisoAparecer{
     0%{ opacity:0; transform: translate(-50%, -50%) scale(0.5) rotate(-6deg); }
@@ -481,7 +481,7 @@ function exibirAvisoFlutuante(mensagem, elementoReferencia){
   aviso.style.left = x + 'px';
   aviso.style.top = y + 'px';
 
-  setTimeout(() => aviso.remove(), 2400);
+  setTimeout(() => aviso.remove(), 4600);
 }
 
 /* =====================================================================
@@ -553,7 +553,7 @@ function clicarPresente(botao){
     setTimeout(() => {
       const frase = fraseTenteOutra[Math.floor(Math.random()*fraseTenteOutra.length)];
       exibirAvisoFlutuante(frase, botao);
-    }, 2500);
+    }, 4800);
   }
 }
 
