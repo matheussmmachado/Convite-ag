@@ -332,6 +332,63 @@
     .tela::before{ top:-14px; }
     .tela::after{ bottom:-14px; }
   }
+
+  /* =====================================================================
+     NOVO — CENA MUSICAL DE ABERTURA (adição incremental, nada acima foi alterado)
+  ===================================================================== */
+
+  /* Container onde as linhas digitadas são inseridas uma a uma */
+  .container-digitado{
+    min-height: 40px;
+  }
+
+  /* Cursor piscante enquanto uma linha está sendo digitada */
+  .cursor-ativo::after{
+    content:"|";
+    animation: piscarCursor 0.8s step-end infinite;
+    color: var(--vermelho);
+  }
+  @keyframes piscarCursor{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0; }
+  }
+
+  /* Overlay de escurecimento suave entre a primeira e a segunda cena */
+  #overlay-escurecido{
+    position:fixed;
+    inset:0;
+    background:#000;
+    opacity:0;
+    z-index:250;
+    pointer-events:none;
+    transition: opacity 1s ease;
+  }
+  #overlay-escurecido.ativo{
+    opacity:0.55;
+  }
+
+  /* Leve transparência na caixa central durante a reprodução da música */
+  .tela-transparente{
+    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(255,214,235,0.75)) !important;
+  }
+
+  /* Intensifica discretamente brilho de estrelas e fotos durante a música */
+  body.modo-musica .estrela{
+    filter: brightness(1.4) drop-shadow(0 0 4px var(--dourado));
+  }
+  body.modo-musica .foto-decorativa{
+    opacity:0.5;
+  }
+  body.modo-musica{
+    animation: gradienteFundo 18s ease infinite; /* leve suavização, mesma animação já existente */
+  }
+
+  /* Botão discreto de pausar/continuar a música */
+  .botao-musica-discreto{
+    font-size: clamp(0.9rem, 2.6vw, 1.05rem) !important;
+    padding: 10px 22px !important;
+    opacity:0.9;
+  }
 </style>
 </head>
 <body>
@@ -350,8 +407,44 @@
 
 <div id="app">
 
+  <!-- ===================================================================
+       NOVO — TELA A: PRIMEIRA MENSAGEM DA CENA DE ABERTURA
+       (esta tela agora é a primeira a aparecer; a "TELA 0" original
+       abaixo permanece 100% intacta, apenas deixou de iniciar "ativa")
+  =================================================================== -->
+  <section class="tela ativa" id="tela-abertura-inicial">
+    <div class="container-digitado" id="texto-abertura-1"></div>
+    <div class="botoes" id="botoes-abertura-1" style="display:none;">
+      <button onclick="respostaAberturaInicial(true)">SIM ❤️</button>
+      <button onclick="respostaAberturaInicial(false)">NÃO</button>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       NOVO — TELA B: CENA MUSICAL
+  =================================================================== -->
+  <section class="tela" id="tela-abertura-musica">
+    <div class="container-digitado" id="texto-abertura-2"></div>
+
+    <div class="botoes" id="botao-ouvir-trecho" style="display:none;">
+      <button onclick="iniciarReproducaoMusica()">🎵 Ouvir esse trecho</button>
+    </div>
+
+    <div class="botoes" id="controles-musica" style="display:none;">
+      <button class="botao-musica-discreto" id="btn-pausar-musica" onclick="alternarPausaMusica()">⏸ Pausar</button>
+    </div>
+
+    <div class="container-digitado" id="mensagens-durante-musica"></div>
+
+    <div class="container-digitado" id="texto-abertura-3"></div>
+
+    <div class="botoes" id="botao-continuar-final" style="display:none;">
+      <button onclick="finalizarAberturaMusical()">Continuar</button>
+    </div>
+  </section>
+
   <!-- TELA 0: INTRO -->
-  <section class="tela ativa" id="tela-intro">
+  <section class="tela" id="tela-intro">
     <h1>💖 Carregando o amor... 💖</h1>
     <p class="texto">Preparando corações, brilhos e uma dose de nostalgia romântica...</p>
     <div class="botoes">
@@ -452,6 +545,18 @@
      SOM DE CLIQUE (opcional) — descomente e ajuste o caminho
      <audio id="som-clique" src="clique.mp3"></audio>
 =================================================== -->
+
+<!-- ===================================================
+     NOVO — ÁUDIO DO TRECHO DA CENA DE ABERTURA
+     Coloque o arquivo de áudio na MESMA PASTA deste HTML,
+     com exatamente este nome de arquivo.
+=================================================== -->
+<audio id="audio-trecho" preload="none">
+  <source src="Djavan - Eu Te Devoro (Áudio Oficial) - DjavanVEVO (youtube).mp3" type="audio/mpeg">
+</audio>
+
+<!-- NOVO — overlay de escurecimento suave entre as cenas de abertura -->
+<div id="overlay-escurecido"></div>
 
 <script>
 /* =====================================================================
@@ -840,6 +945,225 @@ function tocarSom(){
   if(som){ som.currentTime = 0; som.play(); }
 }
 */
+
+/* =====================================================================
+   NOVO — CENA MUSICAL DE ABERTURA (bloco 100% adicional)
+   Nada acima desta linha foi alterado.
+===================================================================== */
+
+/* ---------- Motor de "máquina de escrever" ---------- */
+function digitarTexto(elemento, texto, velocidade, callback){
+  elemento.classList.add('cursor-ativo');
+  let idx = 0;
+  elemento.textContent = '';
+  const intervalo = setInterval(() => {
+    elemento.textContent += texto.charAt(idx);
+    idx++;
+    if(idx >= texto.length){
+      clearInterval(intervalo);
+      elemento.classList.remove('cursor-ativo');
+      if(callback) callback();
+    }
+  }, velocidade);
+}
+
+function digitarLinhas(elementoContainer, linhas, opcoes){
+  opcoes = opcoes || {};
+  const velocidade = opcoes.velocidade || 35;
+  const pausaEntreLinhas = opcoes.pausaEntreLinhas || 1000;
+  let i = 0;
+  function proximaLinha(){
+    if(i >= linhas.length){
+      if(opcoes.onComplete) opcoes.onComplete();
+      return;
+    }
+    const p = document.createElement('p');
+    p.className = 'texto';
+    elementoContainer.appendChild(p);
+    digitarTexto(p, linhas[i], velocidade, () => {
+      i++;
+      setTimeout(proximaLinha, pausaEntreLinhas);
+    });
+  }
+  proximaLinha();
+}
+
+/* ---------- Primeira cena: "Você voltou aqui..." ---------- */
+function iniciarSequenciaAberturaNova(){
+  const container = document.getElementById('texto-abertura-1');
+  if(!container) return; // segurança: se a tela nova não existir, não faz nada
+  digitarLinhas(container, [
+    'Você voltou aqui...',
+    'Estive pensando em você...',
+    'Quer saber o motivo?'
+  ], {
+    velocidade: 35,
+    pausaEntreLinhas: 1000,
+    onComplete: () => {
+      document.getElementById('botoes-abertura-1').style.display = 'flex';
+    }
+  });
+}
+
+function respostaAberturaInicial(simClicado){
+  if(!simClicado){
+    // Nenhuma outra mensagem aparece; segue direto para o fluxo original,
+    // usando a mesma transição (irPara) já existente no site.
+    irPara('tela-intro');
+    return;
+  }
+  transicaoParaCenaMusical();
+}
+
+/* ---------- Transição escurecida entre as duas cenas novas ---------- */
+function transicaoParaCenaMusical(){
+  const overlay = document.getElementById('overlay-escurecido');
+  overlay.classList.add('ativo');
+  setTimeout(() => {
+    irPara('tela-abertura-musica');
+    setTimeout(() => { overlay.classList.remove('ativo'); }, 150);
+    iniciarSegundaMensagem();
+  }, 1000);
+}
+
+/* ---------- Segunda cena: mensagens sobre a música ---------- */
+function iniciarSegundaMensagem(){
+  const container = document.getElementById('texto-abertura-2');
+  digitarLinhas(container, [
+    'Existe uma música...',
+    'Na verdade...',
+    'Existe apenas um pequeno trecho dela...',
+    'Toda vez que escuto esse trecho...',
+    '...eu lembro de você.'
+  ], {
+    velocidade: 35,
+    pausaEntreLinhas: 1000,
+    onComplete: () => {
+      document.getElementById('botao-ouvir-trecho').style.display = 'flex';
+    }
+  });
+}
+
+/* ---------- Reprodução do trecho musical (áudio local, HTML5 Audio) ---------- */
+const INICIO_TRECHO_SEG = 177; // 2min57s
+const FIM_TRECHO_SEG = 227;    // 3min47s
+const DURACAO_FADE_OUT_SEG = 3;
+
+let fadeInIntervalId = null;
+let monitorMusicaIntervalId = null;
+
+function iniciarReproducaoMusica(){
+  const audio = document.getElementById('audio-trecho');
+  const telaMusica = document.getElementById('tela-abertura-musica');
+
+  document.getElementById('botao-ouvir-trecho').style.display = 'none';
+  document.getElementById('controles-musica').style.display = 'flex';
+  document.getElementById('btn-pausar-musica').textContent = '⏸ Pausar';
+
+  telaMusica.classList.add('tela-transparente');
+  document.body.classList.add('modo-musica');
+
+  audio.currentTime = INICIO_TRECHO_SEG;
+  audio.volume = 0;
+  const promessa = audio.play();
+  if(promessa && promessa.catch){
+    promessa.catch(erro => {
+      console.warn('Não foi possível iniciar o áudio automaticamente. É necessário interação da usuária.', erro);
+    });
+  }
+
+  // Fade in suave (~2s)
+  let volumeAtual = 0;
+  clearInterval(fadeInIntervalId);
+  fadeInIntervalId = setInterval(() => {
+    volumeAtual += 0.05;
+    if(volumeAtual >= 1){
+      volumeAtual = 1;
+      clearInterval(fadeInIntervalId);
+    }
+    audio.volume = volumeAtual;
+  }, 100);
+
+  exibirMensagensDuranteMusica();
+
+  // Monitorar o tempo para aplicar fade-out e parar exatamente no ponto certo
+  clearInterval(monitorMusicaIntervalId);
+  monitorMusicaIntervalId = setInterval(() => {
+    if(audio.paused) return;
+
+    const tempoRestante = FIM_TRECHO_SEG - audio.currentTime;
+
+    if(tempoRestante <= DURACAO_FADE_OUT_SEG && tempoRestante > 0){
+      const novoVolume = Math.max(0, Math.min(1, tempoRestante / DURACAO_FADE_OUT_SEG));
+      audio.volume = novoVolume;
+    }
+
+    if(audio.currentTime >= FIM_TRECHO_SEG){
+      audio.pause();
+      audio.volume = 0;
+      clearInterval(monitorMusicaIntervalId);
+      document.getElementById('controles-musica').style.display = 'none';
+      telaMusica.classList.remove('tela-transparente');
+      document.body.classList.remove('modo-musica');
+
+      setTimeout(() => {
+        iniciarMensagensFinais();
+      }, 2000);
+    }
+  }, 150);
+}
+
+function alternarPausaMusica(){
+  const audio = document.getElementById('audio-trecho');
+  const botao = document.getElementById('btn-pausar-musica');
+  if(audio.paused){
+    audio.play();
+    botao.textContent = '⏸ Pausar';
+  } else {
+    audio.pause();
+    botao.textContent = '▶ Continuar';
+  }
+}
+
+function exibirMensagensDuranteMusica(){
+  const container = document.getElementById('mensagens-durante-musica');
+  digitarLinhas(container, [
+    'Não sei explicar exatamente o motivo...',
+    'Talvez algumas pessoas simplesmente passem a morar dentro de certas músicas.',
+    'E, por algum motivo...',
+    '...você mora nessa.'
+  ], {
+    velocidade: 30,
+    pausaEntreLinhas: 1300
+  });
+}
+
+/* ---------- Encerramento da cena musical ---------- */
+function iniciarMensagensFinais(){
+  const container = document.getElementById('texto-abertura-3');
+  digitarLinhas(container, [
+    'Obrigado por ouvir isso.',
+    'Agora podemos continuar... ❤️'
+  ], {
+    velocidade: 35,
+    pausaEntreLinhas: 1000,
+    onComplete: () => {
+      document.getElementById('botao-continuar-final').style.display = 'flex';
+    }
+  });
+}
+
+function finalizarAberturaMusical(){
+  // Some suavemente (mesma transição do site) e inicia o fluxo original,
+  // exatamente como ele já funciona hoje.
+  irPara('tela-intro');
+}
+
+/* ---------- Inicialização da nova cena (listener adicional,
+     não substitui o DOMContentLoaded já existente acima) ---------- */
+window.addEventListener('DOMContentLoaded', () => {
+  iniciarSequenciaAberturaNova();
+});
 </script>
 </body>
 </html>
