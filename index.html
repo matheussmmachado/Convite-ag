@@ -549,10 +549,10 @@
 <!-- ===================================================
      NOVO — ÁUDIO DO TRECHO DA CENA DE ABERTURA
      Coloque o arquivo de áudio na MESMA PASTA deste HTML,
-     renomeado para exatamente: trecho-musica.mp3
+     renomeado para exatamente: djavan-te-devoro.mp3
 =================================================== -->
-<audio id="audio-trecho" preload="none">
-  <source src="trecho-musica.mp3" type="audio/mpeg">
+<audio id="audio-trecho" preload="metadata">
+  <source src="djavan-te-devoro.mp3" type="audio/mpeg">
 </audio>
 
 <!-- NOVO — overlay de escurecimento suave entre as cenas de abertura -->
@@ -1055,23 +1055,52 @@ let monitorMusicaIntervalId = null;
 function iniciarReproducaoMusica(){
   const audio = document.getElementById('audio-trecho');
   const telaMusica = document.getElementById('tela-abertura-musica');
+  const botaoOuvir = document.getElementById('botao-ouvir-trecho');
 
-  document.getElementById('botao-ouvir-trecho').style.display = 'none';
+  botaoOuvir.style.display = 'none';
   document.getElementById('controles-musica').style.display = 'flex';
   document.getElementById('btn-pausar-musica').textContent = '⏸ Pausar';
 
   telaMusica.classList.add('tela-transparente');
   document.body.classList.add('modo-musica');
 
-  audio.currentTime = INICIO_TRECHO_SEG;
-  audio.volume = 0;
-  const promessa = audio.play();
-  if(promessa && promessa.catch){
-    promessa.catch(erro => {
-      console.warn('Não foi possível iniciar o áudio automaticamente. É necessário interação da usuária.', erro);
-    });
+  // Aviso visual caso o arquivo de áudio não seja encontrado/carregado
+  const aoFalharCarregamento = () => {
+    console.warn('Falha ao carregar o arquivo de áudio. Confira o nome exato do arquivo no repositório.');
+    document.getElementById('controles-musica').style.display = 'none';
+    telaMusica.classList.remove('tela-transparente');
+    document.body.classList.remove('modo-musica');
+    exibirAvisoFlutuante('🎧 Não consegui carregar o áudio. Confira o nome do arquivo!', botaoOuvir);
+    botaoOuvir.style.display = 'flex';
+  };
+  audio.removeEventListener('error', aoFalharCarregamento);
+  audio.addEventListener('error', aoFalharCarregamento, { once:true });
+
+  function comecarAReproduzir(){
+    try{ audio.currentTime = INICIO_TRECHO_SEG; }catch(e){ /* seek ainda não suportado, tentaremos mesmo assim */ }
+    audio.volume = 0;
+    const promessa = audio.play();
+    if(promessa && promessa.catch){
+      promessa.catch(erro => {
+        console.warn('Não foi possível iniciar o áudio automaticamente.', erro);
+        aoFalharCarregamento();
+      });
+    }
+    iniciarFadeInEMonitoramento(audio, telaMusica);
   }
 
+  // Se os metadados (duração) ainda não carregaram, espera o evento antes de buscar o tempo certo
+  if(audio.readyState >= 1){
+    comecarAReproduzir();
+  } else {
+    audio.addEventListener('loadedmetadata', comecarAReproduzir, { once:true });
+    audio.load();
+  }
+
+  exibirMensagensDuranteMusica();
+}
+
+function iniciarFadeInEMonitoramento(audio, telaMusica){
   // Fade in suave (~2s)
   let volumeAtual = 0;
   clearInterval(fadeInIntervalId);
@@ -1083,8 +1112,6 @@ function iniciarReproducaoMusica(){
     }
     audio.volume = volumeAtual;
   }, 100);
-
-  exibirMensagensDuranteMusica();
 
   // Monitorar o tempo para aplicar fade-out e parar exatamente no ponto certo
   clearInterval(monitorMusicaIntervalId);
